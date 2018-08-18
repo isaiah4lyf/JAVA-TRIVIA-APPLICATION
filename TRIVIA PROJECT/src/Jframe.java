@@ -45,12 +45,53 @@ public class Jframe extends JFrame{
 	private int questionsAnseredInt;
 	private int correctAnswersInt;
 	private double Percentage;
+	private boolean questionAnsweredCorrectly;
+	private boolean questionAnswered;
+	private boolean multiChoiceAnswered;
+	private int n;
 	public Jframe()
 	{
+		String[][] questionsArray = new String[5][5];
+		questionsArray[0][0] = "What is an operating system?";
+		questionsArray[0][1] = "0";
+		
+		questionsArray[1][0] = "What are the main components of a modern computer?";
+		questionsArray[1][1] = "1";
+		
+		questionsArray[2][0] = "sd3";
+		questionsArray[2][1] = "2";
+		
+		questionsArray[3][0] = "sd4";
+		questionsArray[3][1] = "3";
+		
+		questionsArray[4][0] = "sd5";
+		questionsArray[4][1] = "4";
+		
+		AnswersArray = new String[5];
+		AnswersArray[0] = "0,3";
+		AnswersArray[1] = "1,4";
+		AnswersArray[2] = "answer3";
+		AnswersArray[3] = "2,1";
+		AnswersArray[4] = "answer4";
+		
+		String[] multiAnswersArray = new String[3];
+		multiAnswersArray[0] = " The operating system is the software component responsible for managing all components \n      of a computer and to provide user files with a better, simpler and cleaner model of the computer.\n"
+							+  "~  The operating system is the software component responsible for managing all components \n      of a computer and to provide user programs with a better, simpler and cleaner model of the computer.\n"
+							+  "~ The operating system is the software layer responsible for managing all components \n      of a computer and to provide user programs with a better, simpler and cleaner model of the computer.\n "
+							+  "~ The operating system is the software component responsible for managing all components \n      of a computer and to provide user programs with a better, simpler and cleaner model of the computer.";
+		multiAnswersArray[1] = " One or more processors, Capacitors, Disks and Various IO Devices.\n"
+							+  "~ Disk, Main memory, Disks and Capacitors.\n"
+							+  "~ One or more processors, hardware, Disks and Various IO Devices.\n"
+							+  "~ Various IO Devices, Main Memory, Disks and One or more processors.";
+		multiAnswersArray[2] = " answerk 1~ answerk 2~ answerk 3~ answerk 4";
+		
 		setLayout(new GridLayout(2,1));
 		Percentage = 0;
 		questionsAnseredInt = 0;
 		correctAnswersInt = 0;
+		questionAnsweredCorrectly = false;
+		questionAnswered = false;
+		multiChoiceAnswered = false;
 		
 		JButton train_specific_model = new JButton("SUBMIT ANSWER");
 		text = new JTextField();
@@ -60,21 +101,7 @@ public class Jframe extends JFrame{
 		train_specific_model.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            	questionsAnseredInt++;
-            	if(text.getText().replaceAll(" ", "").equals(AnswersArray[CurrentAnswer]))
-            	{
-    				appendToPane(console_Like,text.getText(), Color.yellow);
-    				appendToPane(console_Like," - " + AnswersArray[CurrentAnswer] + "\n\n", Color.yellow);
-    				text.setText("");
-    				correctAnswersInt++;
-            	}
-            	else
-            	{
-    				appendToPane(console_Like,text.getText(), Color.gray);
-    				appendToPane(console_Like," - " + AnswersArray[CurrentAnswer] + "\n\n", Color.gray);
-    				text.setText("");
-            	}
-
+            	AnswerControl();
             }
         });
 		console_Like = new JTextPane();
@@ -109,32 +136,7 @@ public class Jframe extends JFrame{
 		add(jsp);
 		add(menu_Panel);
 		
-		String[][] questionsArray = new String[5][5];
-		questionsArray[0][0] = "sd1";
-		questionsArray[0][1] = "0";
-		
-		questionsArray[1][0] = "sd2";
-		questionsArray[1][1] = "1";
-		
-		questionsArray[2][0] = "sd3";
-		questionsArray[2][1] = "2";
-		
-		questionsArray[3][0] = "sd4";
-		questionsArray[3][1] = "3";
-		
-		questionsArray[4][0] = "sd5";
-		questionsArray[4][1] = "4";
-		
-		AnswersArray = new String[5];
-		AnswersArray[0] = "answer1";
-		AnswersArray[1] = "answer2";
-		AnswersArray[2] = "answer3";
-		AnswersArray[3] = "1,1";
-		AnswersArray[4] = "answer4";
-		
-		String[] multiAnswersArray = new String[2];
-		multiAnswersArray[0] = "answer 1, answer 2, answer 3, answer 4";
-		multiAnswersArray[1] = "answerk 1, answerk 2, answerk 3, answerk 4";
+
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -146,15 +148,36 @@ public class Jframe extends JFrame{
             			{
             				try
             				{
+            					questionAnsweredCorrectly = false;
+            					questionAnswered = false;
+            					multiChoiceAnswered = false;
                 				Random rand = new Random();
-                				int  n = rand.nextInt(4) + 0;
-                				appendToPane(console_Like, questionsArray[n][0] + "\n\n", Color.red);
+                				n = rand.nextInt(4) + 0;
+                				
+                				String[] answer = AnswersArray[n].split(",");
+                				if(answer.length == 2)
+                				{
+                    				appendToPane(console_Like, questionsArray[n][0] + "\n\n", Color.red);
+                					String[] answerTokens = multiAnswersArray[Integer.parseInt(answer[0])].split("~");
+                					
+                       				appendToPane(console_Like, " a. " + answerTokens[0] + "\n", Color.cyan);
+                       				appendToPane(console_Like, " b. " + answerTokens[1] + "\n", Color.cyan);
+                       				appendToPane(console_Like, " c. " + answerTokens[2] + "\n", Color.cyan);
+                       				appendToPane(console_Like, " d. " + answerTokens[3] + "\n\n", Color.cyan);
+                				}
+                				else
+                				{
+                    				appendToPane(console_Like, questionsArray[n][0] + "\n\n", Color.red);
+                				}
+
                 				CurrentAnswer = Integer.parseInt(questionsArray[n][1]);
                 				totalQuestions++;
-                				totalQuestionsAsked.setText("Total Questions asked: " + String.valueOf(totalQuestions));
-                				correctAnswers.setText("Total Questions asked: " + String.valueOf(totalQuestions));
-                				questionsAnswered.setText("Total Questions asked: " + String.valueOf(totalQuestions));
-                				percentageLabel.setText("Total Questions asked: " + String.valueOf(totalQuestions));
+                				totalQuestionsAsked.setText("Total Questions asked: " + String.valueOf(totalQuestions-1));
+                				correctAnswers.setText("Correct Answeres: " + String.valueOf(correctAnswersInt));
+                				questionsAnswered.setText("Questions Answered: " + String.valueOf(questionsAnseredInt));
+                				
+                				Percentage = Math.round(((double)correctAnswersInt/(double)(totalQuestions-1)) * 100);
+                				percentageLabel.setText("Grade: " + String.valueOf(Percentage) + "%");
                 				Thread.sleep(10000);
                 				appendToPane(console_Like, AnswersArray[n] + "\n\n", Color.GREEN);
 
@@ -196,7 +219,67 @@ public class Jframe extends JFrame{
 	        tp.setEditable(false);
 	    }
 
+	  public void AnswerControl()
+	  {
+		 	if(questionAnsweredCorrectly == false && multiChoiceAnswered == false)
+          	{
+          		if(questionAnswered == false)
+          		{
+          			questionsAnseredInt++;
+          		}
+				String[] answer = AnswersArray[n].split(",");
+				if(answer.length == 2)
+				{
+					String choice = "";
+					if(answer[1].equals("1"))
+					{
+						choice = "a";
+					}
+					else if(answer[1].equals("2"))
+					{
+						choice = "b";
+					}
+					else if(answer[1].equals("3"))
+					{
+						choice = "c";
+					}
+					else if(answer[1].equals("4"))
+					{
+						choice = "d";
+					}
+       				if(text.getText().replaceAll(" ", "").equals(choice))
+       				{
+       					appendToPane(console_Like,"Correct! \n\n", Color.yellow);
+          				correctAnswersInt += 1;;
+          				questionAnsweredCorrectly = true;
+       				}
+       				else
+       				{
+       					appendToPane(console_Like,"Wrong!" + "\n\n", Color.gray);
+       				}
+       				multiChoiceAnswered = true;
+				}
+				else
+				{
+                  	if(text.getText().replaceAll(" ", "").equals(AnswersArray[CurrentAnswer]))
+                  	{
+          				appendToPane(console_Like,"Correct! \n\n", Color.yellow);
+          				
+          				correctAnswersInt += 1;;
+          				questionAnsweredCorrectly = true;
+                  	}
+                  	else
+                  	{
+          				appendToPane(console_Like,text.getText(), Color.gray);
+          				appendToPane(console_Like," - " + "Wrong!" + "\n\n", Color.gray);
+                  	}
+				}
 
+          	}
+          	text.setText("");
+          	questionAnswered = true;
+
+	  }
 
 
 	  public class SubmitButton implements ActionListener, KeyListener {
@@ -210,20 +293,8 @@ public class Jframe extends JFrame{
 
 	      @Override
 	      public void actionPerformed(ActionEvent submitClicked) {
-          	questionsAnseredInt++;
-          	if(text.getText().replaceAll(" ", "").equals(AnswersArray[CurrentAnswer]))
-          	{
-  				appendToPane(console_Like,text.getText(), Color.yellow);
-  				appendToPane(console_Like," - " + AnswersArray[CurrentAnswer] + "\n\n", Color.yellow);
-  				text.setText("");
-  				correctAnswersInt++;
-          	}
-          	else
-          	{
-  				appendToPane(console_Like,text.getText(), Color.gray);
-  				appendToPane(console_Like," - " + AnswersArray[CurrentAnswer] + "\n\n", Color.gray);
-  				text.setText("");
-          	}
+	    	  AnswerControl();
+
 	      }
 
 	      @Override
